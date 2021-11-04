@@ -9,8 +9,8 @@ Board-oriented project management platform
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
      :target: https://github.com/ambv/black
      :alt: Black code style
-
-:License: MIT
+.. image:: https://img.shields.io/github/license/Egor4ik325/demanage
+     :alt: GitHub
 
 Settings
 --------
