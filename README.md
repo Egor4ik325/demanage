@@ -18,7 +18,29 @@ Similar applications:
 
 ## Description/requirements
 
-### Roadmap
+## Roadmap
+
+- Permissions
+
+- Models
+
+- MVTs
+
+- APIs
+
+- Celery
+
+- Integrations
+
+### Todo
+
+- [x] Project setup
+
+- [ ] Organization model + admin interface
+
+- [ ] Organization representative permission group
+
+- [ ] 
 
 - [ ] Team model/admin (role/permission system)
 
@@ -56,6 +78,30 @@ Work flow:
 
 3. Manager or teammates add assignees to the task and move to in-progress list. Start working on the task, may write comments while doing.
 
+### Permissions
+
+I want:
+
+- Admins can add users to organization representative group.
+
+- Organization representative group users can create/delete single organization from MVT interface.
+
+- Owner can update team and set member permissions from MVT.
+
+- Team administrators can create/delete boards and invite members from API/SPA.
+
+- Members can update boards and create/update/delete lists and tasks from SPA (API).
+
+Organization representative group should be available without creating it via admin interface (created at the migration stage).
+
+There are available following permission system options:
+
+1. model-level (website-level)
+
+2. field-level
+
+3. instance-level (user-level)
+
 ### Project
 
 Initial project was generated using Cookicutter Django template and provide following features:
@@ -82,7 +128,7 @@ Initial project was generated using Cookicutter Django template and provide foll
 
 - postgresql
 
-### Hybrid Architecture
+### Hybrid Architecture (full stack rendering)
 
 The project will have the following parts:
 
@@ -135,6 +181,8 @@ Innovations:
 - important dates
 
 - events
+
+- internationalization (MVT, API, SPA)
 
 - timeline, deadlines
 
