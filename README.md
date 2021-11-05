@@ -20,11 +20,11 @@ Similar applications:
 
 ## Roadmap
 
-- Permissions
-
 - Models
 
 - MVTs
+
+- Permissions
 
 - APIs
 
@@ -36,17 +36,19 @@ Similar applications:
 
 - [x] Project setup
 
-- [ ] Organization model + admin interface
+- [x] Organization model + admin interface
+
+- [ ] Organization MVT user interface
 
 - [ ] Organization representative permission group
 
-- [ ] 
+- [ ] Organization member model
 
-- [ ] Team model/admin (role/permission system)
+- [ ] Organization member inviting
 
-- [ ] Team view/template
+- [ ] Organization member permission group
 
-- [ ] Inviting
+- [ ] Organization administrator permission group
 
 - [ ] Board model/admin + API
 
@@ -80,7 +82,7 @@ Work flow:
 
 ### Permissions
 
-I want:
+Short website permission description:
 
 - Admins can add users to organization representative group.
 
@@ -92,9 +94,52 @@ I want:
 
 - Members can update boards and create/update/delete lists and tasks from SPA (API).
 
+### Organization
+
+Organization model:
+
+- name field - unicode char field (required).
+
+- slug field - created from unicode name, slug also support unicode  (required in the model and admin, not shown in MVT) (prepolulated in the admin and set from name in the form).
+
+- location field - contains real world country (default=US).
+
+- verified field - editable from admin interface, disabled (read-only) from MVT interface (default=False).
+
+- website_url field - contains organization website or blog URL (optional).
+
+- public field - controls whether the organization is visible (viewable) by non-members (default=True).
+
+Organization permission asserted **test cases**:
+
+- Superuser has permission to create organizations, view/delete/update any organization.
+
+- Organization representative has permission to create organization instance.
+
+- Users not in org repr. group don't have permission to create or delete any organizations.
+  Superuser and org representative have permission to add user to the organization administration group, organization administrators and members don't.
+
+- Organization administrator has permission to update organization.
+
+- Org. repr. can not create more than 1 organization instance.
+
+- Org. repr. has permission to view, update and delete their organization instance.
+
+- Other org representatives don't have permission to delete or update other org instances.
+
+- Org members have permission to view their public/private organization.
+
+- Everyone can view public organization.
+
+- Superuser has permission to update organization verified status.
+
+- Organization representative, administrator and member have permission to view verified status, and aren't able to update it (read-only field).
+
+- Org representative, org administrators or org members don't have permission to update organization verified status.
+
 Organization representative group should be available without creating it via admin interface (created at the migration stage).
 
-There are available following permission system options:
+Permissions and groups work like a user tagging to any actions they are allowed. There are available following permission system options:
 
 1. model-level (website-level)
 

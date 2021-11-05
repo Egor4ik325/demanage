@@ -72,11 +72,12 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
+    "django_countries",
 ]
 
 LOCAL_APPS = [
     "demanage.users.apps.UsersConfig",
-    # Your stuff: custom apps go here
+    "demanage.organizations.apps.OrganizationsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
