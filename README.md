@@ -1,5 +1,10 @@
 # #9 - Demanage
 
+<p align="center">
+  <img src="./img/icon.png" width="200">
+  <h2 align="center">Demanage</h2>
+</p>
+
 Boarding-style project dev management system/website/web app/web API/web service/tool/platform. In contract to general project management systems this project only focuses on the kanban style of management (basically boards).
 
 Goals of this project:
@@ -37,6 +42,8 @@ Similar applications:
 - [x] Project setup
 
 - [x] Organization model + admin interface
+
+- [x] Translate assertions into tests
 
 - [ ] Organization MVT user interface
 
