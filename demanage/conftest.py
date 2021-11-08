@@ -1,3 +1,4 @@
+import factory
 import pytest
 
 from demanage.organizations.models import Organization
@@ -22,5 +23,10 @@ def organization_factory() -> OrganizationFactory:
 
 
 @pytest.fixture
-def organization(organization_factory) -> Organization:
+def organization(organization_factory: OrganizationFactory) -> Organization:
     return organization_factory()
+
+
+@pytest.fixture
+def organization_dict(organization_factory: OrganizationFactory) -> dict:
+    return factory.build(dict, FACTORY_CLASS=organization_factory)
