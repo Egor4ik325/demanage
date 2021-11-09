@@ -11,11 +11,7 @@ from django.urls import reverse
 from demanage.users.forms import UserChangeForm
 from demanage.users.models import User
 from demanage.users.tests.factories import UserFactory
-from demanage.users.views import (
-    UserRedirectView,
-    UserUpdateView,
-    user_detail_view,
-)
+from demanage.users.views import UserRedirectView, UserUpdateView, user_detail_view
 
 pytestmark = pytest.mark.django_db
 

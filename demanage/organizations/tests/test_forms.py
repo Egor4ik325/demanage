@@ -57,7 +57,7 @@ def test_organization_name_slug(organization_dict: dict):
     organization = form.save()
 
     assert organization.name == organization_dict.get("name")
-    assert organization.slug == slugify(organization_dict.get("name"))
+    assert organization.slug == slugify(organization_dict["name"])
 
 
 def test_organization_name_unique(organization: Organization, organization_dict: dict):

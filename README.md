@@ -103,13 +103,13 @@ Short website permission description:
 
 ### Organization
 
-Organization model:
+**Organization model**:
 
 - name field - unicode char field (required).
 
 - slug field - created from unicode name, slug also support unicode  (required in the model and admin, not shown in MVT) (prepolulated in the admin and set from name in the form).
 
-- location field - contains real world country (default=US).
+- location field - contains real world country code.
 
 - verified field - editable from admin interface, disabled (read-only) from MVT interface (default=False).
 
@@ -143,6 +143,8 @@ Organization permission asserted **test cases**:
 - Organization representative, administrator and member have permission to view verified status, and aren't able to update it (read-only field).
 
 - Org representative, org administrators or org members don't have permission to update organization verified status.
+
+**Groups**:
 
 Organization representative group should be available without creating it via admin interface (created at the migration stage).
 

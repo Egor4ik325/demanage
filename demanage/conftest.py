@@ -1,3 +1,5 @@
+from typing import Type
+
 import factory
 import pytest
 
@@ -18,7 +20,7 @@ def user() -> User:
 
 
 @pytest.fixture
-def organization_factory() -> OrganizationFactory:
+def organization_factory() -> Type[OrganizationFactory]:
     return OrganizationFactory
 
 
