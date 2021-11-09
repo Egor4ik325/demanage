@@ -16,7 +16,12 @@ def test_organization_str(organization: Organization):
 
 
 def test_organization_get_absolute_url(organization: Organization):
-    pass
+    """
+    Assert that absolute URL of the object should be equal to its detail URL.
+    """
+    assert organization.get_absolute_url() == reverse(
+        "organization:detail", kwargs={"slug": organization.slug}
+    )
 
 
 def test_organization_ordering(organization_factory: OrganizationFactory):

@@ -16,7 +16,7 @@ urlpatterns = [
     # User management
     path("users/", include("demanage.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
+    path("o/", include("demanage.organizations.urls", namespace="organizations")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS
