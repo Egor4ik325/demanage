@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Create organization{% endblock title %}
+
+{% block content %}
+
+  <div class="container">
+    {# Update action #}
+    {% if object %}
+      <h2>Update org.</h2>
+
+      {% url 'organizations:update' object.slug as action %}
+      {% include 'fragments/form.html' with action=action submit_text="Update" %}
+    {# Create action #}
+    {% else %}
+      <h2>Create org.</h2>
+
+      {% url 'organizations:create' as action %}
+      {% include 'fragments/form.html' with action=action submit_text="Create" %}
+    {% endif %}
+  </div>
+
+{% endblock content %}

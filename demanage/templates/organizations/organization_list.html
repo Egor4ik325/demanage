@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Organizations{% endblock title %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h2>Organizations</h2>
+
+        <p><a href="{% url 'organizations:create' %}">Create</a></p>
+
+        {% if object_list %}
+          <ul>
+            {% for organization in object_list %}
+              <li>
+                <a href="{% url 'organizations:detail' organization.slug %}">
+                  {{ organization }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>You are not member of any organization</p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

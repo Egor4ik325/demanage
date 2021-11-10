@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Organization{% endblock title %}
+
+{% block content %}
+  <div class="container">
+
+    <div class="row justify-content-sm-center" style="height: 100%">
+      <div class="col-sm-6 d-flex align-items-center" style="height: 100%">
+        <div class="p-3 bg-light rounded-3 d-flex flex-column align-items-between" style="height: 200px">
+          <p class="fs-4">Are you sure you want to delete organization "{{ object }}"?</p>
+
+          <form action="{% url 'organizations:delete' object.slug %}" method="POST">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-danger" type="submit">Yes</button>
+              <a class="btn btn-secondary" href="{% url 'home' %}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} {% url 'organizations:delete' as action %}
+    {% include 'fragments/form.html' with action=action submit_text="Delete" %} {% endcomment %}
+  </div>
+{% endblock content %}
