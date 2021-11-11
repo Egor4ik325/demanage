@@ -102,3 +102,9 @@ def test_organization_name_blank(organization_dict: dict):
         data=dict(filter(lambda p: p[0] != "name", organization_dict.items()))
     )
     assert form.is_valid() is False
+
+
+@pytest.mark.parametrize("name", ["create", "read", "update", "delete"])
+def test_organization_crud_name(name, organization_dict: dict):
+    form = OrganizationCreationForm(data={**organization_dict, "name": name})
+    assert form.is_valid() is False

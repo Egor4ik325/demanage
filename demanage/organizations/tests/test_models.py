@@ -1,5 +1,6 @@
 import factory
 import pytest
+from django.urls import reverse
 
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
@@ -20,7 +21,7 @@ def test_organization_get_absolute_url(organization: Organization):
     Assert that absolute URL of the object should be equal to its detail URL.
     """
     assert organization.get_absolute_url() == reverse(
-        "organization:detail", kwargs={"slug": organization.slug}
+        "organizations:detail", kwargs={"slug": organization.slug}
     )
 
 
