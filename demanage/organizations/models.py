@@ -21,6 +21,10 @@ class Organization(models.Model):
         verbose_name = _("Organization")
         verbose_name_plural = _("Organizations")
         ordering = ["name"]
+        get_latest_by = "id"
+        unique_together = []
+        default_permissions = ("add", "change", "delete", "view")
+        permissions = []
 
     def __str__(self):
         return self.name

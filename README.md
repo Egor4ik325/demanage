@@ -11,7 +11,7 @@ Goals of this project:
 
 - learn production-ready (real-world) project setup
 
-- finalize technologies coverage (task queue) 
+- learn task queue in web application
 
 - learn hybric webapp architecture
 
@@ -45,9 +45,9 @@ Similar applications:
 
 - [x] Translate assertions into tests
 
-- [ ] Organization MVT user interface
+- [x] Organization MVT user interface
 
-- [ ] Organization representative permission group
+- [x] Organization representative permission group
 
 - [ ] Organization member model
 
@@ -306,7 +306,7 @@ Innovations:
 - message broker (RabbitMQ)
 - task worker
 - PDF generation
-- 3-rd party APIs
+- 3-rd party RESTful APIs
 - 3-rd party Python packages
 - 3-rd party Django packages
 - error reporting
