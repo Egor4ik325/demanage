@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -44,13 +45,17 @@ class OrganizationDetailView(DetailView):
 organization_detail_view = OrganizationDetailView.as_view()
 
 
-class OrganizationCreateView(CreateView):
+class OrganizationCreateView(PermissionRequiredMixin, CreateView):
     """
     Create new organization object.
     """
 
     model = Organization
     form_class = OrganizationCreationForm
+    permission_required = ["organizations.add_organization"]
+    permission_denied_message = (
+        "Only organization representative has permission to create organization!"
+    )
 
 
 organization_create_view = OrganizationCreateView.as_view()

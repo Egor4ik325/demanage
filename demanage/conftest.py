@@ -2,6 +2,7 @@ from typing import Type
 
 import factory
 import pytest
+from django.contrib.auth.models import Group
 
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
@@ -17,6 +18,18 @@ def media_storage(settings, tmpdir):
 @pytest.fixture
 def user() -> User:
     return UserFactory()
+
+
+@pytest.fixture
+def organization_representative(user: User) -> User:
+    """
+    Return user which consist in representative group.
+    """
+    organization_representative_group = Group.objects.get(
+        name="Organization Representatives"
+    )
+    user.groups.add(organization_representative_group)
+    return User.objects.get(pk=user.pk)
 
 
 @pytest.fixture

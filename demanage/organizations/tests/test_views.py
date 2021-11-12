@@ -13,7 +13,9 @@ from typing import Generator
 
 import factory
 import pytest
-from django.contrib.auth.models import AnonymousUser
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser, User
+from django.core.exceptions import PermissionDenied
 from django.http.response import (
     Http404,
     HttpResponse,
@@ -26,6 +28,7 @@ from django.views.generic.edit import ProcessFormView
 
 from demanage.organizations.models import Organization
 from demanage.organizations.views import (
+    OrganizationCreateView,
     OrganizationDetailView,
     organization_create_view,
     organization_delete_view,
@@ -84,7 +87,14 @@ class TestDetailView:
 
 
 class TestCreateView:
-    def test_create_blank_form(self, rf: RequestFactory):
+    @pytest.fixture
+    def mock_permission_required(
+        self, monkeypatch: Generator["MonkeyPatch", None, None]
+    ):
+        monkeypatch.setattr(OrganizationCreateView, "has_permission", lambda self: True)
+        yield
+
+    def test_create_blank_form(self, mock_permission_required, rf: RequestFactory):
         """
         Response of the GET request to create_view should be:
 
@@ -99,7 +109,7 @@ class TestCreateView:
         assert "organizations/organization_form.html" in response.template_name
 
     def test_create_response_valid_data(
-        self, rf: RequestFactory, organization_data: dict
+        self, mock_permission_required, rf: RequestFactory, organization_data: dict
     ):
         """
         Response of the POST creating new organization with valid data should be:
@@ -114,7 +124,7 @@ class TestCreateView:
         assert response.url.startswith("/o/")  # basically is detail URL
 
     def test_create_response_invalid_form_data(
-        self, rf: RequestFactory, organization_data: dict
+        self, mock_permission_required, rf: RequestFactory, organization_data: dict
     ):
         """
         When POST request with invalid data is passed response should be:
@@ -129,6 +139,100 @@ class TestCreateView:
         assert response.status_code == HttpResponse.status_code
         # response.context["form"]  # otherwise AttributeError
         assert "organizations/organization_form.html" in response.template_name
+
+    def test_create_form_template_response(
+        self, mock_permission_required, rf: RequestFactory
+    ):
+        request = rf.get("/mocked-url")
+        response = organization_create_view(request)
+
+        # Only test rendered template in response
+        assert "organizations/organization_form.html" in response.template_name
+
+    def test_get_create_form_has_permission_response(
+        self, rf: RequestFactory, organization_representative: User
+    ):
+        """
+        User in organization representative group tries to get form for creation:
+
+        - Successful response (200)
+        """
+        request = rf.get("mocked request's url")
+        request.user = organization_representative
+        response = organization_create_view(request)
+
+        assert response.status_code == 200
+
+    def test_post_create_form_with_permission_response(
+        self,
+        rf: RequestFactory,
+        organization_representative: User,
+        organization_data: dict,
+    ):
+        """
+        Response of posting create form by organization represetnative:
+
+        - Redirect to the organization detail view
+        """
+        request = rf.post("mocked request's url", data=organization_data)
+        request.user = organization_representative
+        response = organization_create_view(request)
+
+        assert response.status_code == 302
+        assert response.url.startswith("/o/")
+
+    def test_response_get_form_not_authenticated(self, rf: RequestFactory):
+        """
+        When unauthenicated users try to get/post create form
+        they should be redirected to the login page.
+
+        - Response status - 302
+        - Redirect to /login/
+        """
+        request = rf.get("/fake-url/")
+        request.user = AnonymousUser()
+        response = organization_create_view(request)
+
+        login_url = reverse(settings.LOGIN_URL)
+
+        assert response.status_code == 302
+        assert response.url == f"{login_url}?next=/fake-url/"
+
+    def test_response_post_form_not_auth(
+        self, rf: RequestFactory, organization_data: dict
+    ):
+        request = rf.post("/fake-url/", data=organization_data)
+        request.user = AnonymousUser()
+        response = organization_create_view(request)
+
+        login_url = reverse(settings.LOGIN_URL)
+
+        assert response.status_code == 302
+        assert response.url == f"{login_url}?next=/fake-url/"
+
+    def test_response_get_form_doesnt_have_permission(
+        self, rf: RequestFactory, user: User
+    ):
+        """
+        Response when trying to get/post create form when not have permission (not org. repr.)
+
+        - Forbidden access (403)
+        """
+        request = rf.post("mocked request's url")
+        request.user = user
+        with pytest.raises(PermissionDenied):
+            response = organization_create_view(request)
+
+    def test_response_post_form_doesnt_have_permission(
+        self, rf: RequestFactory, user: User, organization_data: dict
+    ):
+        """
+        Test response for non-organization-representative users should be 403.
+        """
+        request = rf.post("mocked request's url", data=organization_data)
+        request.user = user
+        with pytest.raises(PermissionDenied):
+            response = organization_create_view(request)
 
 
 class TestUpdateView:
