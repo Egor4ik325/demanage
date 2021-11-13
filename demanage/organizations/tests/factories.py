@@ -4,6 +4,7 @@ from factory import Faker
 from factory.django import DjangoModelFactory
 
 from demanage.organizations.models import Organization
+from demanage.users.tests.factories import UserFactory
 
 
 class OrganizationFactory(DjangoModelFactory):
@@ -13,6 +14,7 @@ class OrganizationFactory(DjangoModelFactory):
     website = Faker("url")
     location = Faker("country_code")
     verified = factory.Iterator([True, False])
+    representative = factory.SubFactory(UserFactory)
 
     class Meta:
         model = Organization

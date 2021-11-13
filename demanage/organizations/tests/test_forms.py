@@ -19,7 +19,7 @@ def test_organization_creation_form(organization_dict: dict, monkeypatch):
 
     form = OrganizationCreationForm(data=organization_dict)
     assert form.is_valid() is True
-    organization = form.save()
+    organization = form.save(commit=False)
 
     assert organization.name == organization_dict.get("name")
     assert organization.slug == organization_dict.get("slug")
@@ -39,7 +39,7 @@ def test_organization_change_form(organization_dict: dict, monkeypatch, faker):
         data={**organization_dict, "name": name}, instance=organization
     )
     assert form.is_valid() is True
-    organization = form.save()
+    organization = form.save(commit=False)
 
     assert organization.name == name
     assert organization.slug == organization_dict.get("slug")
@@ -54,7 +54,7 @@ def test_organization_name_slug(organization_dict: dict):
     del organization_dict["verified"]
     form = OrganizationCreationForm(data=organization_dict)
     assert form.is_valid() is True
-    organization = form.save()
+    organization = form.save(commit=False)
 
     assert organization.name == organization_dict.get("name")
     assert organization.slug == slugify(organization_dict["name"])
@@ -88,7 +88,7 @@ def test_organization_website_unique(
 def test_organization_verified_field(organization_dict: dict):
     form = OrganizationCreationForm(data={**organization_dict, "verified": True})
     assert form.is_valid() is True
-    organization = form.save()
+    organization = form.save(commit=False)
     assert organization.verified is False
 
 

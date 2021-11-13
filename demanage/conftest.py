@@ -44,4 +44,6 @@ def organization(organization_factory: OrganizationFactory) -> Organization:
 
 @pytest.fixture
 def organization_dict(organization_factory: OrganizationFactory) -> dict:
-    return factory.build(dict, FACTORY_CLASS=organization_factory)
+    organization_dictionary = factory.build(dict, FACTORY_CLASS=organization_factory)
+    organization_dictionary["representative"].save()
+    return organization_dictionary

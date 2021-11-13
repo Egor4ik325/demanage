@@ -57,6 +57,12 @@ class OrganizationCreateView(PermissionRequiredMixin, CreateView):
         "Only organization representative has permission to create organization!"
     )
 
+    def form_valid(self, form: OrganizationCreationForm):
+        self.object = form.save(commit=False)
+        self.object.representative = self.request.user
+        self.object.save()
+        return super().form_valid(form)  # redirect
+
 
 organization_create_view = OrganizationCreateView.as_view()
 

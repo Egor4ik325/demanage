@@ -39,6 +39,7 @@ def test_organization_public_blank_default(organization_factory: OrganizationFac
     organization_dict = factory.build(dict, FACTORY_CLASS=organization_factory)
     del organization_dict["public"]
     organization = Organization(**organization_dict)
+    organization.representative.save()  # subfactory not saved when running factory.build
     organization.save()
     assert organization.public, "public should be set to True by default"
 
@@ -48,6 +49,7 @@ def test_organization_verified_blank_default(organization_factory: OrganizationF
     organization_dict = factory.build(dict, FACTORY_CLASS=organization_factory)
     del organization_dict["verified"]
     organization = Organization(**organization_dict)
+    organization.representative.save()
     organization.save()
     assert not organization.verified, "verified should be set to False by default"
 

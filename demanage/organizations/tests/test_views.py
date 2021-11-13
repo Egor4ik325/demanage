@@ -26,6 +26,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.views.generic.edit import ProcessFormView
 
+from demanage.organizations.forms import OrganizationCreationForm
 from demanage.organizations.models import Organization
 from demanage.organizations.views import (
     OrganizationCreateView,
@@ -109,19 +110,28 @@ class TestCreateView:
         assert "organizations/organization_form.html" in response.template_name
 
     def test_create_response_valid_data(
-        self, mock_permission_required, rf: RequestFactory, organization_data: dict
+        self,
+        mock_permission_required,
+        rf: RequestFactory,
+        organization_data: dict,
+        user: User,
     ):
         """
         Response of the POST creating new organization with valid data should be:
 
+        - Test form_valid method (represetnative assignement and saving for org)
         - Status of the response should be 200 OK or 201 Created (or redirect)
         - Response should redirect to the detail page of created organization
         - The organization should be saved in the database
         """
         request = rf.post("/mocked-url", data=organization_data)
+        request.user = user
         response = organization_create_view(request)
         assert response.status_code == HttpResponseRedirect.status_code
         assert response.url.startswith("/o/")  # basically is detail URL
+
+        organization = Organization.objects.get(name=organization_data["name"])
+        assert organization.representative.pk == user.pk
 
     def test_create_response_invalid_form_data(
         self, mock_permission_required, rf: RequestFactory, organization_data: dict

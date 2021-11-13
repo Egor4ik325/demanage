@@ -37,6 +37,8 @@ Similar applications:
 
 - Integrations
 
+- Monitoring
+
 ### Todo
 
 - [x] Project setup
@@ -62,6 +64,8 @@ Similar applications:
 - [ ] Task API
 
 - [ ] Notifications
+
+- [ ] MailHog
 
 ### Design
 
@@ -244,7 +248,7 @@ Innovations:
 
 - team collaboration (assignees)
 
-- e-mail confirmation (Twilio/SendGrid)
+- <u>e-mail confirmation (Twilio/SendGrid)</u>
 
 - teams/workspaces/boards/lists/cards
 
@@ -301,19 +305,19 @@ Traditions:
 Innovations:
 
 - cookiecutter
-- custom admin theme/interface
+- <u>custom admin theme/interface</u>
 - task queue (Celery)
 - message broker (RabbitMQ)
 - task worker
-- PDF generation
-- 3-rd party RESTful APIs
+- *PDF generation*
+- <u>3-rd party RESTful APIs</u>
 - 3-rd party Python packages
 - 3-rd party Django packages
-- error reporting
-- integrated chat
+- <u>error reporting</u>
+- *integrated chat*
 - custom Swagger UI theme
 - django command extensions
-- push notification to mobile devices
+- *push notification to mobile devices*
 - send emails/SMS service
 
 ## Web services
@@ -327,3 +331,5 @@ List of potential web services that will be used in this projects:
 - AWS (cloud)
 
 - Sentry (monitoring)
+
+- RapidAPI (APIs)
