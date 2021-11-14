@@ -26,13 +26,16 @@ from django.http.response import (
 from django.test import RequestFactory
 from django.urls import reverse
 from django.views.generic.edit import ProcessFormView
+from guardian.mixins import PermissionRequiredMixin
 
 from demanage.organizations.forms import OrganizationCreationForm
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
 from demanage.organizations.views import (
     OrganizationCreateView,
+    OrganizationDeleteView,
     OrganizationDetailView,
+    OrganizationUpdateView,
     organization_create_view,
     organization_delete_view,
     organization_detail_view,
@@ -60,14 +63,42 @@ class TestDetailView:
     - Test all possible execution paths (based on own code/business logic)
     """
 
-    def test_detail_template_response(
-        self, rf: RequestFactory, organization: Organization
+    def test_can_view_public_organization(
+        self, rf: RequestFactory, organization_factory: OrganizationFactory, user: User
     ):
+        organization = organization_factory(public=True)
         request = rf.get("/url-is-not-being-tested/")
+        request.user = user
         response = organization_detail_view(request, slug=organization.slug)
-        assert response.status_code == HttpResponse.status_code
-        # assert response.context.get("object") == organization
-        assert "organizations/organization_detail.html" in response.template_name
+
+        assert response.status_code == 200, "Response status should be 200 OK"
+        assert (
+            "organizations/organization_detail.html" in response.template_name
+        ), "Detail template should be rendered for any user"
+
+    def test_cannot_view_private_organization(
+        self, rf: RequestFactory, organization_factory: OrganizationFactory, user: User
+    ):
+        organization = organization_factory(public=False)
+        request = rf.get("/url-is-not-being-tested/")
+        request.user = user
+        response = organization_detail_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 404
+        ), "Private organization should not be available to users without permission"
+
+    def test_has_perm_to_view_private_organization(
+        self, rf: RequestFactory, organization_factory: OrganizationFactory
+    ):
+        organization = organization_factory(public=False)
+        request = rf.get("/url-is-not-being-tested/")
+        request.user = organization.representative
+        response = organization_detail_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 200
+        ), "Private organization should be available to users with permission"
 
     def test_detail_template_response_organization_not_found(
         self, rf: RequestFactory, organization: Organization
@@ -77,9 +108,6 @@ class TestDetailView:
             response = organization_detail_view(
                 request, slug=f"fake-{organization.slug}"
             )
-
-        # assert response.status_code == HttpResponseNotFound.status_code
-        # assert response.context.get("object") is None
 
     def test_get_object(self, organization: Organization):
         """
@@ -291,76 +319,121 @@ class TestCreateView:
         )
 
 
+@pytest.fixture
+def mock_check_permissions(monkeypatch: Generator["MonkeyPatch", None, None]):
+    def mocked_check_permissions(self, request):
+        return None
+
+    monkeypatch.setattr(
+        PermissionRequiredMixin, "check_permissions", mocked_check_permissions
+    )
+    yield
+
+
 class TestUpdateView:
+    def test_can_not_get_update_form(
+        self,
+        rf: RequestFactory,
+        organization: Organization,
+        user: User,
+        organization_data: dict,
+    ):
+        request = rf.get("/mocked-request-above")
+        request.user = user
+        response = organization_update_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 404
+        ), "Organization update for user without permission should not be found"
+
+    def test_can_not_post_update_form(
+        self,
+        rf: RequestFactory,
+        organization: Organization,
+        user: User,
+        organization_data: dict,
+    ):
+        request = rf.post("/mocked-url", data=organization_data)
+        request.user = user
+        response = organization_update_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 404
+        ), "Organization update for user without permission should not be found"
+
+    def test_has_perm_get_update_form(
+        self,
+        rf: RequestFactory,
+        organization: Organization,
+        organization_data: dict,
+    ):
+        request = rf.get("/mocked-request-above")
+        request.user = organization.representative
+        response = organization_update_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 200
+        ), "Organization update should be found for permissive users"
+
+    def test_has_perm_post_update_form(
+        self,
+        rf: RequestFactory,
+        organization: Organization,
+        organization_data: dict,
+    ):
+        request = rf.post("/mocked-url", data=organization_data)
+        request.user = organization.representative
+        response = organization_update_view(request, slug=organization.slug)
+
+        assert (
+            response.status_code == 302
+        ), "Organization update for user without permission should be updated"
+
     def test_get_update_response_blank_form(
         self,
+        mock_check_permissions,
         rf: RequestFactory,
         organization: Organization,
         organization_data: Organization,
     ):
-        """
-        Response of the GET request to update_view (get form for editing):
-
-        - Successful response (200 OK)
-        - form fulled with object data (bind) (in context and HTML)
-        - HTML update template rendered
-        """
         request = rf.get("/mocked-request-above")
         response = organization_update_view(request, slug=organization.slug)
-        assert response.status_code == HttpResponse.status_code
-        # assert response.context.get("form") is not None
-        # assert response.context["form"].is_bound is True
+        assert response.status_code == 200
         assert "organizations/organization_form.html" in response.template_name
 
     def test_get_update_form_response_org_not_exists(self, rf: RequestFactory):
-        """
-        Test response when trying to get update form for no organization.
-
-        - Response status should be Http404 (org not found)
-        - template should be 404 handler template
-        """
         request = rf.get("/mocked-request-above")
         with pytest.raises(Http404):
             response = organization_update_view(
                 request, slug="non-existing-organization-slug"
             )
-        # assert response.status_code == HttpResponseNotFound.status_code
-        # assert "404.html" in response.template_name
 
     def test_update_response_valid_update_data(
-        self, rf: RequestFactory, organization: Organization, organization_data: dict
+        self,
+        mock_check_permissions,
+        rf: RequestFactory,
+        organization: Organization,
+        organization_data: dict,
     ):
-        """
-        Response of the POST updating organization with valid data should be:
-
-        - Status of the response should redirect
-        - Response should redirect to the detail page
-        - Organization should be updated
-        """
         request = rf.post(
             "/mocked-url", data={**organization_data, "name": f"{organization.name}2"}
         )
         response = organization_update_view(request, slug=organization.slug)
+
         assert response.status_code == HttpResponseRedirect.status_code
-        organization = Organization.objects.get(pk=organization.pk)
         assert response.url == reverse(
-            "organizations:detail", kwargs={"slug": organization.slug}
+            "organizations:detail",
+            kwargs={"slug": Organization.objects.get(pk=organization.pk).slug},
         )
 
     def test_update_response_invalid_update_data(
         self,
+        mock_check_permissions,
+        monkeypatch: Generator["MonkeyPatch", None, None],
         rf: RequestFactory,
         organization: Organization,
         organization_data: dict,
-        monkeypatch: Generator["MonkeyPatch", None, None],
     ):
-        """
-        Response of the POST updating organization with invalid data should be:
-
-        - Status of the response should be (400 bad client request) - invalid data
-        - Should stay on the same page
-        """
-
         def mock_post(self, request, *args, **kwargs):
             form = self.get_form()
             return self.form_invalid(form)
@@ -371,13 +444,46 @@ class TestUpdateView:
             "/mocked-url", data={**organization_data, "country": "Fake country code"}
         )
         response = organization_update_view(request, slug=organization.slug)
+
         assert response.status_code == HttpResponse.status_code
         assert "organizations/organization_form.html" in response.template_name
 
 
 class TestDeleteView:
-    def test_confirm_delete_from_response(
+    def test_can_not_confirm_delete_no_permission(
+        self, rf: RequestFactory, organization: Organization, user: User
+    ):
+        request = rf.get("/blabal")
+        request.user = user
+        response = organization_delete_view(request, slug=organization.slug)
+        assert response.status_code == 404
+
+    def test_can_not_delete_no_permission(
+        self, rf: RequestFactory, organization: Organization, user: User
+    ):
+        request = rf.delete("/blabal")
+        request.user = user
+        response = organization_delete_view(request, slug=organization.slug)
+        assert response.status_code == 404
+
+    def test_can_confirm_delete_has_permission(
         self, rf: RequestFactory, organization: Organization
+    ):
+        request = rf.get("/blabal")
+        request.user = organization.representative
+        response = organization_delete_view(request, slug=organization.slug)
+        assert response.status_code == 200
+
+    def test_can_delete_has_permission(
+        self, rf: RequestFactory, organization: Organization
+    ):
+        request = rf.post("/blabal")
+        request.user = organization.representative
+        response = organization_delete_view(request, slug=organization.slug)
+        assert response.status_code == 302
+
+    def test_confirm_delete_from_response(
+        self, mock_check_permissions, rf: RequestFactory, organization: Organization
     ):
         """
         Tests form for confirming deletion.
@@ -392,10 +498,9 @@ class TestDeleteView:
         assert (
             "organizations/organization_confirm_delete.html" in response.template_name
         )
-        # assert response.context.get("object") is not None
 
     def test_delete_respose_organizatin_exist(
-        self, rf: RequestFactory, organization: Organization
+        self, mock_check_permissions, rf: RequestFactory, organization: Organization
     ):
         """
         Test what should happen when delete is confirmed:
@@ -412,16 +517,9 @@ class TestDeleteView:
     def test_delete_form_response_not_found(
         self, rf: RequestFactory, organization: Organization
     ):
-        """
-        Try to get form for deleting non-existing organization.
-
-        - Http404
-        """
         request = rf.get("/blabal")
         with pytest.raises(Http404):
             response = organization_delete_view(request, slug=f"{organization.slug}2")
-        # assert response.status_code == HttpResponse.status_code
-        # assert "404.html" in response.template_name
 
     def test_delete_response_not_found(
         self, rf: RequestFactory, organization: Organization
@@ -435,8 +533,6 @@ class TestDeleteView:
             response = organization_delete_view(
                 request, slug=f"{organization.slug}-fake"
             )
-        # assert response.status_code == HttpResponseNotFound.status_code
-        # assert "404.html" in response.template_name
 
 
 class TestListView:

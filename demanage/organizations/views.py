@@ -1,4 +1,6 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    PermissionRequiredMixin as ModelPermissionRequiredMixin,
+)
 from django.core.exceptions import PermissionDenied
 from django.db.utils import IntegrityError
 from django.forms import BaseModelForm
@@ -10,6 +12,7 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
+from guardian.mixins import PermissionRequiredMixin
 from guardian.shortcuts import assign_perm
 
 from demanage.organizations.forms import (
@@ -33,7 +36,7 @@ class OrganizationListView(ListView):
 organization_list_view = OrganizationListView.as_view()
 
 
-class OrganizationDetailView(DetailView):
+class OrganizationDetailView(PermissionRequiredMixin, DetailView):
     """
     Display organization (all fields).
 
@@ -44,12 +47,24 @@ class OrganizationDetailView(DetailView):
     """
 
     model = Organization
+    permission_required = ["organizations.view_organization"]
+    return_404 = True
+
+    def check_permissions(self, request):
+        """
+        Add additional checking for object is public organization.
+        """
+        obj = self.get_permission_object()
+        if obj.public:
+            return None
+
+        return super().check_permissions(request)
 
 
 organization_detail_view = OrganizationDetailView.as_view()
 
 
-class OrganizationCreateView(PermissionRequiredMixin, CreateView):
+class OrganizationCreateView(ModelPermissionRequiredMixin, CreateView):
     """
     Create new organization object.
     """
@@ -84,25 +99,29 @@ class OrganizationCreateView(PermissionRequiredMixin, CreateView):
 organization_create_view = OrganizationCreateView.as_view()
 
 
-class OrganizationUpdateView(UpdateView):
+class OrganizationUpdateView(PermissionRequiredMixin, UpdateView):
     """
     Update organization object.
     """
 
     model = Organization
     form_class = OrganizationChangeForm
+    permission_required = ["organizations.change_organization"]
+    return_404 = True
 
 
 organization_update_view = OrganizationUpdateView.as_view()
 
 
-class OrganizationDeleteView(DeleteView):
+class OrganizationDeleteView(PermissionRequiredMixin, DeleteView):
     """
     Delete organization object.
     """
 
     model = Organization
     success_url = reverse_lazy("home")
+    permission_required = ["organizations.delete_organization"]
+    return_404 = True
 
 
 organization_delete_view = OrganizationDeleteView.as_view()

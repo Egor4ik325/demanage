@@ -1,7 +1,10 @@
+from typing import Any, Sequence
+
 import factory
 from django.utils.text import slugify
-from factory import Faker
+from factory import Faker, post_generation
 from factory.django import DjangoModelFactory
+from guardian.shortcuts import assign_perm
 
 from demanage.organizations.models import Organization
 from demanage.users.tests.factories import UserFactory
@@ -15,6 +18,18 @@ class OrganizationFactory(DjangoModelFactory):
     location = Faker("country_code")
     verified = factory.Iterator([True, False])
     representative = factory.SubFactory(UserFactory)
+
+    @post_generation
+    def permissions(obj, create: bool, extracted: Sequence[Any], **kwargs):
+        if not create:
+            return
+
+        for perm in [
+            "organizations.view_organization",
+            "organizations.change_organization",
+            "organizations.delete_organization",
+        ]:
+            assign_perm(perm, obj.representative, obj)
 
     class Meta:
         model = Organization
