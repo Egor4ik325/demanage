@@ -1,4 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.db.utils import IntegrityError
+from django.forms import BaseModelForm
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -7,6 +10,7 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
+from guardian.shortcuts import assign_perm
 
 from demanage.organizations.forms import (
     OrganizationChangeForm,
@@ -57,10 +61,23 @@ class OrganizationCreateView(PermissionRequiredMixin, CreateView):
         "Only organization representative has permission to create organization!"
     )
 
-    def form_valid(self, form: OrganizationCreationForm):
+    def form_valid(self, form: BaseModelForm):
         self.object = form.save(commit=False)
         self.object.representative = self.request.user
-        self.object.save()
+        # The form DOESN'T HANDLE IntegrityError because user is set outside of it
+        try:
+            self.object.save()
+        except IntegrityError:
+            # Raise exception to respond with 403 error status
+            raise PermissionDenied("You can not create more than one organization.")
+
+        for perm in [
+            "organizations.view_organization",
+            "organizations.change_organization",
+            "organizations.delete_organization",
+        ]:
+            assign_perm(perm, self.request.user, self.object)
+
         return super().form_valid(form)  # redirect
 
 

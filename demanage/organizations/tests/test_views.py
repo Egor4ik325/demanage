@@ -16,6 +16,7 @@ import pytest
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
+from django.db.utils import IntegrityError
 from django.http.response import (
     Http404,
     HttpResponse,
@@ -28,6 +29,7 @@ from django.views.generic.edit import ProcessFormView
 
 from demanage.organizations.forms import OrganizationCreationForm
 from demanage.organizations.models import Organization
+from demanage.organizations.tests.factories import OrganizationFactory
 from demanage.organizations.views import (
     OrganizationCreateView,
     OrganizationDetailView,
@@ -47,6 +49,7 @@ def organization_data(organization_dict: dict) -> dict:
     data = organization_dict.copy()
     del data["slug"]
     del data["verified"]
+    del data["representative"]
     return data
 
 
@@ -243,6 +246,49 @@ class TestCreateView:
         request.user = user
         with pytest.raises(PermissionDenied):
             response = organization_create_view(request)
+
+    def test_representative_create_2_organizations_response(
+        self,
+        rf: RequestFactory,
+        organization_representative: User,
+        organization_factory: OrganizationFactory,
+        organization_data: dict,
+    ):
+        """
+        Test representative can not create more than 1 organization.
+
+        - Form validation won't fail because user is set outside the form.
+        - PermissionDenied exception should be raised when IntegrityError occur.
+        """
+        organization = organization_factory(representative=organization_representative)
+
+        request = rf.post("/faked-url/", data=organization_data)
+        request.user = organization_representative
+
+        with pytest.raises(PermissionDenied):
+            organization_create_view(request)
+
+    def test_permissions_are_assigned(
+        self, rf: RequestFactory, organization_representative: User, organization_data
+    ):
+        """
+        User has permission to update, delete and view created organization.
+
+        - IntegrityError exception should be raise (because of unique constrained is failed)
+        """
+        request = rf.post("/some-url/", data=organization_data)
+        request.user = organization_representative
+        response = organization_create_view(request)
+        created_organization = Organization.objects.get(name=organization_data["name"])
+
+        assert organization_representative.has_perms(
+            [
+                "organizations.view_organization",
+                "organizations.change_organization",
+                "organizations.delete_organization",
+            ],
+            created_organization,
+        )
 
 
 class TestUpdateView:
