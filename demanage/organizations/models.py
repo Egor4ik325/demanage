@@ -1,3 +1,5 @@
+from typing import List
+
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -28,9 +30,14 @@ class Organization(models.Model):
         verbose_name_plural = _("Organizations")
         ordering = ["name"]
         get_latest_by = "id"
-        unique_together = []
+        unique_together: List[str] = []
         default_permissions = ["add", "change", "delete", "view"]
-        permissions = []
+        # Organization level permissions
+        permissions = [
+            ("view_member", "Can view member(s) of organization"),
+            ("invite_member", "Can invite (add) new member(s) to organization"),
+            ("kick_member", "Can kick (delete) member(s) from organization"),
+        ]
 
     def __str__(self):
         return self.name

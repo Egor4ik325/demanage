@@ -1,4 +1,4 @@
-from typing import Type
+from typing import List, Tuple, Type
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -34,11 +34,8 @@ class Member(models.Model):
         verbose_name_plural = "Members"
         ordering = ["join_time"]
         unique_together = [["user", "organization"]]
-        default_permissions = ["view"]  # can view all members of organization
-        permissions = [
-            ("can_invite", "Can invite (add) new member to organization"),
-            ("can_kick", "Can kick (delete) member from organization"),
-        ]
+        default_permissions: List[str] = []
+        permissions: List[Tuple[str, str]] = []
 
     def clean(self):
         """
@@ -56,11 +53,12 @@ class Member(models.Model):
         - members can view organization they are in (detail)
         - members can view members in organization they are in (detail/list)
         """
-        super().save(*args, **kwargs)
-
-        if self._state.adding is True:
+        if self._state.adding:
+            super().save(*args, **kwargs)
             assign_perm("organizations.view_organization", self.user, self.organization)
-            assign_perm("members.view_member", self.user, self.organization)
+            assign_perm("organizations.view_member", self.user, self.organization)
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user} in {self.organization}"
@@ -82,5 +80,5 @@ def member_post_delete_receiver(sender: Type[Member], instance: Member, **kwargs
     Remove organization/member assigned permission after member have been deleted.
     """
 
-    assign_perm("organizations.view_organization", instance.user, instance.organization)
-    assign_perm("members.view_member", instance.user, instance.organization)
+    remove_perm("organizations.view_organization", instance.user, instance.organization)
+    remove_perm("organizations.view_member", instance.user, instance.organization)
