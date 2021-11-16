@@ -4,6 +4,8 @@ import factory
 import pytest
 from django.contrib.auth.models import Group
 
+from demanage.members.models import Member
+from demanage.members.tests.factories import MemberFactory
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
 from demanage.users.models import User
@@ -38,7 +40,7 @@ def organization_factory() -> Type[OrganizationFactory]:
 
 
 @pytest.fixture
-def organization(organization_factory: OrganizationFactory) -> Organization:
+def organization(organization_factory: Type[OrganizationFactory]) -> Organization:
     return organization_factory()
 
 
@@ -47,3 +49,13 @@ def organization_dict(organization_factory: OrganizationFactory) -> dict:
     organization_dictionary = factory.build(dict, FACTORY_CLASS=organization_factory)
     organization_dictionary["representative"].save()
     return organization_dictionary
+
+
+@pytest.fixture
+def member_factory() -> Type[MemberFactory]:
+    return MemberFactory
+
+
+@pytest.fixture
+def member(member_factory: Type[MemberFactory]) -> Member:
+    return member_factory()
