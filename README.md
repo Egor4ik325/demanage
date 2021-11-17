@@ -51,13 +51,13 @@ Similar applications:
 
 - [x] Organization representative permission group
 
-- [ ] Organization member model
+- [x] Organization member model
 
-- [ ] Organization member inviting
+- [ ] Organization member **invitation**
 
-- [ ] Organization member permission group
+- [x] Organization member permission group
 
-- [ ] Organization administrator permission group
+- [ ] ~~Organization administrator permission group~~
 
 - [ ] Board model/admin + API
 

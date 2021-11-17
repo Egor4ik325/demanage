@@ -69,7 +69,7 @@ class Member(models.Model):
         Combine organization slug and username for unique identification.
         """
         return reverse(
-            "members:detail",
+            "organizations:members:detail",
             kwargs={"slug": self.organization.slug, "username": self.user.username},
         )
 

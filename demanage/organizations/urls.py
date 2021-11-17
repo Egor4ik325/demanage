@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from demanage.organizations.views import (
     organization_create_view,
@@ -16,4 +16,5 @@ urlpatterns = [
     path("<slug:slug>/", organization_detail_view, name="detail"),
     path("<slug:slug>/update/", organization_update_view, name="update"),
     path("<slug:slug>/delete/", organization_delete_view, name="delete"),
+    path("<slug:slug>/", include("demanage.members.api.urls", namespace="members")),
 ]

@@ -58,3 +58,14 @@ def test_user_remove_permissions(member: Member):
     user = User.objects.get(pk=member.user.pk)
     assert not user.has_perm("organizations.view_organization", member.organization)
     assert not user.has_perm("organizations.view_member", member.organization)
+
+
+def test_member_queryset_join_time_ordering(member_factory: MemberFactory):
+    m1 = member_factory()
+    m2 = member_factory()
+    m3 = member_factory()
+
+    assert Member.objects.count() == 3
+    assert Member.objects.all()[0] == m1
+    assert Member.objects.all()[1] == m2
+    assert Member.objects.all()[2] == m3
