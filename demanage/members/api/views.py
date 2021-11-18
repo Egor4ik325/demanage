@@ -1,6 +1,8 @@
-from rest_framework import filters, viewsets
+from django.db.models.query import QuerySet
+from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 
+from demanage.members.api.permissions import MemberPermission
 from demanage.members.api.serializers import MemberSerializer
 from demanage.members.models import Member
 from demanage.organizations.models import Organization
@@ -18,16 +20,16 @@ class MemberViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_value_regex = r"[^/.]+"
 
     # Authorization
-    permission_classes = []
+    permission_classes = [MemberPermission]
 
-    def get_organization(self):
+    def get_organization(self) -> Organization:
         return get_object_or_404(Organization, slug=self.kwargs["slug"])
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         organization = self.get_organization()
         return organization.members.all()
 
-    def get_object(self):
+    def get_object(self) -> Member:
         return super().get_object()
 
 
