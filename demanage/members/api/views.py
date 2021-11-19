@@ -2,10 +2,12 @@ from django.db.models.query import QuerySet
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 
+from demanage.members.api.pagination import MemberPagination
 from demanage.members.api.permissions import MemberPermission
 from demanage.members.api.serializers import MemberSerializer
 from demanage.members.models import Member
 from demanage.organizations.models import Organization
+from demanage.throttles import DemanageBurstThrottle
 
 
 class MemberViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,6 +23,10 @@ class MemberViewSet(viewsets.ReadOnlyModelViewSet):
 
     # Authorization
     permission_classes = [MemberPermission]
+    throttle_classes = [DemanageBurstThrottle]
+
+    # Result correction
+    pagination_class = MemberPagination
 
     def get_organization(self) -> Organization:
         return get_object_or_404(Organization, slug=self.kwargs["slug"])
