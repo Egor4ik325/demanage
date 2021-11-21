@@ -3,7 +3,10 @@ from typing import Type
 import factory
 import pytest
 from django.contrib.auth.models import Group
+from rest_framework.test import APIRequestFactory
 
+from demanage.invitations.models import Invitation
+from demanage.invitations.tests.factories import InvitationFactory
 from demanage.members.models import Member
 from demanage.members.tests.factories import MemberFactory
 from demanage.organizations.models import Organization
@@ -59,3 +62,14 @@ def member_factory() -> Type[MemberFactory]:
 @pytest.fixture
 def member(member_factory: Type[MemberFactory]) -> Member:
     return member_factory()
+
+
+@pytest.fixture
+def api_rf() -> APIRequestFactory:
+    """APIRequestFactory instance. Automatically disables CSRF."""
+    return APIRequestFactory()
+
+
+@pytest.fixture
+def invitation() -> Invitation:
+    return InvitationFactory()

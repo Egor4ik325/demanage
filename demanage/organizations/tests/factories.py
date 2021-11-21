@@ -25,9 +25,11 @@ class OrganizationFactory(DjangoModelFactory):
             return
 
         for perm in [
+            # Organization
             "organizations.view_organization",
             "organizations.change_organization",
             "organizations.delete_organization",
+            # Member
             "organizations.view_member",
             "organizations.invite_member",
             "organizations.kick_member",

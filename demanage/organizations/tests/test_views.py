@@ -314,9 +314,12 @@ class TestCreateView:
                 "organizations.view_organization",
                 "organizations.change_organization",
                 "organizations.delete_organization",
+                "organizations.view_member",
+                "organizations.invite_member",
+                "organizations.kick_member",
             ],
             created_organization,
-        )
+        ), "Representative should be granted with permissions to organization managements and it's members"
 
 
 @pytest.fixture

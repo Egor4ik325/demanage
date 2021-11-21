@@ -87,9 +87,11 @@ class OrganizationCreateView(ModelPermissionRequiredMixin, CreateView):
             raise PermissionDenied("You can not create more than one organization.")
 
         for perm in [
+            # Organization management
             "organizations.view_organization",
             "organizations.change_organization",
             "organizations.delete_organization",
+            # Member management
             "organizations.view_member",
             "organizations.invite_member",
             "organizations.kick_member",
