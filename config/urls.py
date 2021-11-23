@@ -6,6 +6,9 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
+from config.api_router import urlpatterns as api_router_urlpatterns
+from config.api_urls import urlpatterns as api_urls_urlpatterns
+
 # MVT URLs
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -21,10 +24,10 @@ urlpatterns = [
     path("o/", include("demanage.organizations.urls", namespace="organizations")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# API URLS
+# API URLs
 urlpatterns += [
-    # API base url
-    path("api/", include("config.api_router")),
+    # Include 2 urlpatterns (list) under "api" app_name
+    path("api/", include((api_router_urlpatterns + api_urls_urlpatterns, "api"))),
     # DRF auth token
     path("auth-token/", obtain_auth_token),
 ]

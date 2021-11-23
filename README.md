@@ -53,19 +53,21 @@ Similar applications:
 
 - [x] Organization member model
 
-- [ ] Organization member **invitation**
-
 - [x] Organization member permission group
+
+- [ ] Member kick functionality
+
+- [x] Organization member **invitation**
 
 - [ ] ~~Organization administrator permission group~~
 
-- [ ] Board model/admin + API
+- [ ] Configure email authentication (instead of console backend)
 
-- [ ] Task API
+- [ ] Boards, lists, tasks
 
 - [ ] Notifications
 
-- [ ] MailHog
+- [ ] MailHog - email testing
 
 ### Design
 
@@ -276,7 +278,7 @@ Innovations:
 
 Integrations with other business services:
 
-- Slack
+- **Slack**
 
 - Jira
 
@@ -304,21 +306,21 @@ Traditions:
 
 Innovations:
 
-- cookiecutter
+- <u>cookiecutter</u>
 - <u>custom admin theme/interface</u>
+- <u>3-rd party RESTful APIs</u>
+- <u>error reporting</u>
+- <u>custom Swagger UI theme</u>
+- 3-rd party Python packages
 - task queue (Celery)
 - message broker (RabbitMQ)
 - task worker
 - *PDF generation*
-- <u>3-rd party RESTful APIs</u>
-- 3-rd party Python packages
-- 3-rd party Django packages
-- <u>error reporting</u>
 - *integrated chat*
-- custom Swagger UI theme
 - django command extensions
 - *push notification to mobile devices*
-- send emails/SMS service
+- *send emails/SMS service*
+- 3-rd party Django packages
 
 ## Web services
 

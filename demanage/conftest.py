@@ -3,7 +3,8 @@ from typing import Type
 import factory
 import pytest
 from django.contrib.auth.models import Group
-from rest_framework.test import APIRequestFactory
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient, APIRequestFactory
 
 from demanage.invitations.models import Invitation
 from demanage.invitations.tests.factories import InvitationFactory
@@ -68,6 +69,27 @@ def member(member_factory: Type[MemberFactory]) -> Member:
 def api_rf() -> APIRequestFactory:
     """APIRequestFactory instance. Automatically disables CSRF."""
     return APIRequestFactory()
+
+
+@pytest.fixture
+def api_client():
+    """Return not authenticated API client to use for making requests."""
+    return APIClient()
+
+
+@pytest.fixture
+def api_client_login(api_client, user):
+    # Login without password (in order to create API token)
+    api_client.force_login(user)
+    return api_client
+
+
+@pytest.fixture
+def api_client_auth(api_client, user):
+    """Return client with authorization header set."""
+    token, created = Token.objects.get_or_create(user=user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+    return api_client
 
 
 @pytest.fixture

@@ -15,3 +15,8 @@ def test_invitation_invite_url(organization: Organization):
         reverse("api:invitations:invite", kwargs={"slug": organization.slug})
         == f"/api/o/{organization.slug}/invite/"
     )
+
+
+def test_invitation_join_url():
+    assert resolve("/api/join/").view_name == "api:invitations:join"
+    assert reverse("api:invitations:join") == "/api/join/"
