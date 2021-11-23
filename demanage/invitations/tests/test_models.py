@@ -39,3 +39,7 @@ def test_invitations_ordered_by_time_by_default():
     assert invitations[0] == i1
     assert invitations[1] == i2
     assert invitations[2] == i3
+
+
+def test_get_join_url(invitation):
+    assert invitation.get_join_url() == f"/api/join/?invite={invitation.pk}"
