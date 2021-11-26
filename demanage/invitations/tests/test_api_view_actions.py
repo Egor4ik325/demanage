@@ -108,7 +108,7 @@ def test_invitation_is_deleted_after_join(api_rf, invitation):
     user = UserFactory(email=invitation.email)
     request = api_rf.get(f"mocked-request/?invite={invitation.pk}")
     request.user = user
-    response = invitation_join_view(request)
+    response = invitation_join_view(request)  # noqa
 
     with pytest.raises(Invitation.DoesNotExist):
         invitation.refresh_from_db()

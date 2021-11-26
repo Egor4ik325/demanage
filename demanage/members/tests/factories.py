@@ -1,5 +1,4 @@
 import factory
-from factory import Faker
 from factory.django import DjangoModelFactory
 
 from demanage.members.models import Member

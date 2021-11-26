@@ -2,7 +2,6 @@ import pytest
 from celery.result import EagerResult
 from django.core import mail
 
-from demanage.invitations.models import Invitation
 from demanage.invitations.tasks import send_invitation
 
 pytestmark = pytest.mark.django_db

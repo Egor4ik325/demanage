@@ -1,4 +1,3 @@
-import factory
 import pytest
 from django.forms import ModelForm
 from django.utils.text import slugify

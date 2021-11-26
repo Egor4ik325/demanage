@@ -11,31 +11,22 @@ Test views authorization is working.
 """
 from typing import Generator
 
-import factory
 import pytest
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.db.utils import IntegrityError
-from django.http.response import (
-    Http404,
-    HttpResponse,
-    HttpResponseNotFound,
-    HttpResponseRedirect,
-)
+from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory
 from django.urls import reverse
 from django.views.generic.edit import ProcessFormView
 from guardian.mixins import PermissionRequiredMixin
+from pytest import MonkeyPatch
 
-from demanage.organizations.forms import OrganizationCreationForm
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
 from demanage.organizations.views import (
     OrganizationCreateView,
-    OrganizationDeleteView,
     OrganizationDetailView,
-    OrganizationUpdateView,
     organization_create_view,
     organization_delete_view,
     organization_detail_view,
@@ -105,9 +96,7 @@ class TestDetailView:
     ):
         request = rf.get("/mocked-request-url/")
         with pytest.raises(Http404):
-            response = organization_detail_view(
-                request, slug=f"fake-{organization.slug}"
-            )
+            organization_detail_view(request, slug=f"fake-{organization.slug}")
 
     def test_get_object(self, organization: Organization):
         """
@@ -262,7 +251,7 @@ class TestCreateView:
         request = rf.post("mocked request's url")
         request.user = user
         with pytest.raises(PermissionDenied):
-            response = organization_create_view(request)
+            organization_create_view(request)
 
     def test_response_post_form_doesnt_have_permission(
         self, rf: RequestFactory, user: User, organization_data: dict
@@ -273,7 +262,7 @@ class TestCreateView:
         request = rf.post("mocked request's url", data=organization_data)
         request.user = user
         with pytest.raises(PermissionDenied):
-            response = organization_create_view(request)
+            organization_create_view(request)
 
     def test_representative_create_2_organizations_response(
         self,
@@ -288,7 +277,7 @@ class TestCreateView:
         - Form validation won't fail because user is set outside the form.
         - PermissionDenied exception should be raised when IntegrityError occur.
         """
-        organization = organization_factory(representative=organization_representative)
+        organization_factory(representative=organization_representative)
 
         request = rf.post("/faked-url/", data=organization_data)
         request.user = organization_representative
@@ -306,7 +295,7 @@ class TestCreateView:
         """
         request = rf.post("/some-url/", data=organization_data)
         request.user = organization_representative
-        response = organization_create_view(request)
+        organization_create_view(request)
         created_organization = Organization.objects.get(name=organization_data["name"])
 
         assert organization_representative.has_perms(
@@ -407,9 +396,7 @@ class TestUpdateView:
     def test_get_update_form_response_org_not_exists(self, rf: RequestFactory):
         request = rf.get("/mocked-request-above")
         with pytest.raises(Http404):
-            response = organization_update_view(
-                request, slug="non-existing-organization-slug"
-            )
+            organization_update_view(request, slug="non-existing-organization-slug")
 
     def test_update_response_valid_update_data(
         self,
@@ -522,7 +509,7 @@ class TestDeleteView:
     ):
         request = rf.get("/blabal")
         with pytest.raises(Http404):
-            response = organization_delete_view(request, slug=f"{organization.slug}2")
+            organization_delete_view(request, slug=f"{organization.slug}2")
 
     def test_delete_response_not_found(
         self, rf: RequestFactory, organization: Organization
@@ -533,9 +520,7 @@ class TestDeleteView:
         """
         request = rf.delete("/blabal")
         with pytest.raises(Http404):
-            response = organization_delete_view(
-                request, slug=f"{organization.slug}-fake"
-            )
+            organization_delete_view(request, slug=f"{organization.slug}-fake")
 
 
 class TestListView:

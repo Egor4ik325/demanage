@@ -41,7 +41,7 @@ class InviteAPIView(views.APIView):
             raise InviteError()
 
         # Send invite, returns task
-        task = send_invitation.delay(invitation.pk)
+        task = send_invitation.delay(invitation.pk)  # noqa
 
         return response.Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
