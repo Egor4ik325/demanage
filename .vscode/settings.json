@@ -1,4 +1,7 @@
 {
   "python.pythonPath": "/Users/egorzorin/.local/share/virtualenvs/demanage-7DD6t2Nc/bin/python",
-  "python.pipenvPath": "/Users/egorzorin/.local/share/virtualenvs/demanage-7DD6t2Nc/bin/activate"
+  "python.pipenvPath": "/Users/egorzorin/.local/share/virtualenvs/demanage-7DD6t2Nc/bin/activate",
+  "cSpell.words": [
+    "demanage"
+  ]
 }
