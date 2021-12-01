@@ -11,6 +11,7 @@ from config.api_urls import urlpatterns as api_urls_urlpatterns
 
 # MVT URLs
 urlpatterns = [
+    # Pages
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"

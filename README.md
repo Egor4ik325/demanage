@@ -11,9 +11,9 @@ Goals of this project:
 
 - learn production-ready (real-world) project setup
 
-- learn task queue in web application
+- learn task queue in web application (tasks)
 
-- learn hybric webapp architecture
+- learn hybric webapp architecture (MVT together with API and SPA)
 
 Similar applications:
 
@@ -37,6 +37,8 @@ Similar applications:
 
 - Integrations
 
+- Deployment
+
 - Monitoring
 
 ### Todo
@@ -59,15 +61,17 @@ Similar applications:
 
 - [x] Organization member **invitation**
 
-- [ ] ~~Organization administrator permission group~~
-
-- [ ] Configure email authentication (instead of console backend)
-
-- [ ] Boards, lists, tasks
+- [ ] Board, list, task API CRUDs
 
 - [ ] Notifications
 
-- [ ] MailHog - email testing
+- [ ] Slack integration
+
+- [ ] Configure email authentication (production)
+
+- [ ] Configure error monitoring (production)
+
+- [ ] Single-page application
 
 ### Design
 
@@ -196,7 +200,7 @@ The project will have the following parts:
 
 - API part: RESTful web API routes for making interactive SPA part (like CRUD API for boards, task and other dynamic elements)
 
-- SPA part: dynamic, interactive, client-side rendered AJAX single page (utilizes API to be fast without page reloading) (like boards/lists/tasks on-the-fly from pop-up) + illustrative routes for more structured  (react-router)
+- SPA part: dynamic, interactive, client-side rendered AJAX single page (utilizes API to be fast without page reloading) (like boards/lists/tasks on-the-fly from pop-up) + illustrative routes for more structured
 
 ### About
 
@@ -306,25 +310,25 @@ Traditions:
 
 Innovations:
 
-- <u>cookiecutter</u>
-- <u>custom admin theme/interface</u>
-- <u>3-rd party RESTful APIs</u>
+- **<u>3-rd party RESTful APIs</u>**
+- **task worker**
+- ~~cookiecutter~~
+- <u>custom admin theme/interface</u>/<u>custom Swagger UI theme</u>
+- **Production deployment to AWS (successful - really)**
 - <u>error reporting</u>
-- <u>custom Swagger UI theme</u>
-- 3-rd party Python packages
 - task queue (Celery)
 - message broker (RabbitMQ)
-- task worker
-- *PDF generation*
-- *integrated chat*
-- django command extensions
+- --*PDF generation*
+- --*integrated chat*
+- --django command extensions
 - *push notification to mobile devices*
 - *send emails/SMS service*
+- 3-rd party Python packages
 - 3-rd party Django packages
 
 ## Web services
 
-List of potential web services that will be used in this projects:
+List of potential web services that will be used in this projects (development/production):
 
 - Mailgun (email)
 
