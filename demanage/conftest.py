@@ -6,6 +6,8 @@ from django.contrib.auth.models import Group
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APIRequestFactory
 
+from demanage.boards.models import Board
+from demanage.boards.tests.factories import BoardFactory
 from demanage.invitations.models import Invitation
 from demanage.invitations.tests.factories import InvitationFactory
 from demanage.members.models import Member
@@ -95,3 +97,8 @@ def api_client_auth(api_client, user):
 @pytest.fixture
 def invitation() -> Invitation:
     return InvitationFactory()
+
+
+@pytest.fixture
+def board() -> Board:
+    return BoardFactory()

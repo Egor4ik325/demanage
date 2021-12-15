@@ -83,6 +83,7 @@ LOCAL_APPS = [
     "demanage.organizations.apps.OrganizationsConfig",
     "demanage.members.apps.MembersConfig",
     "demanage.invitations.apps.InvitationsConfig",
+    "demanage.boards.apps.BoardsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
