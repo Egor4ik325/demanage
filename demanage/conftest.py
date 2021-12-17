@@ -102,3 +102,15 @@ def invitation() -> Invitation:
 @pytest.fixture
 def board() -> Board:
     return BoardFactory()
+
+
+@pytest.fixture
+def board_build_dict(organization) -> dict:
+    """Return dictionary of data for unsaved object.
+    Built dictionary contatins only the fields set in the factory.
+    """
+    # save objects assigned to foreign keys recursively (organization is saved)
+    board_dictionary = factory.build(
+        dict, organization=organization.id, FACTORY_CLASS=BoardFactory
+    )
+    return board_dictionary
