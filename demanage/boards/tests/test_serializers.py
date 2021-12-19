@@ -2,17 +2,17 @@ import pytest
 from rest_framework import serializers
 
 from demanage.boards.models import Board
+from demanage.conftest import organization
 
 pytestmark = pytest.mark.django_db
 
 from ..serializers import BoardSerializer
 
 
-def test_fake_factory_data_is_valid(board_data):
-    # from pdb import set_trace
-
-    # set_trace()
-    serializer = BoardSerializer(data=board_data)
+def test_fake_factory_data_is_valid(board_data, organization, rq):
+    user = organization.representative
+    rq.user = user
+    serializer = BoardSerializer(data=board_data, context={"request": rq})
     assert serializer.is_valid()
 
 
@@ -59,9 +59,16 @@ def test_title_can_not_be_rewriten(board):
     assert board.title != "New title"
 
 
-def test_title_can_not_be_rewriten(board, organization):
+def test_organization_can_not_be_changed(board, organization, rq):
+    user = organization.representative
+    rq.user = user
     serializer = BoardSerializer(
-        board, data={"organization": organization.id}, partial=True
+        board,
+        data={"organization": organization.slug},
+        partial=True,
+        context={
+            "request": rq
+        },  # organization should belong to the user (limit related choices)
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
