@@ -4,6 +4,7 @@ import factory
 import pytest
 from django.contrib.auth.models import Group
 from rest_framework.authtoken.models import Token
+from rest_framework.request import Request
 from rest_framework.test import APIClient, APIRequestFactory
 
 from demanage.boards.models import Board
@@ -74,6 +75,12 @@ def api_rf() -> APIRequestFactory:
 
 
 @pytest.fixture
+def rq(api_rf) -> Request:
+    """Return fake request object."""
+    return api_rf.get("/some mocked url/")
+
+
+@pytest.fixture
 def api_client():
     """Return not authenticated API client to use for making requests."""
     return APIClient()
@@ -95,6 +102,16 @@ def api_client_auth(api_client, user):
 
 
 @pytest.fixture
+def api_client_factory(api_client, user):
+    def factory(user=user):
+        token, _ = Token.objects.get_or_create(user=user)
+        api_client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+        return api_client
+
+    return factory
+
+
+@pytest.fixture
 def invitation() -> Invitation:
     return InvitationFactory()
 
@@ -111,6 +128,6 @@ def board_build_dict(organization) -> dict:
     """
     # save objects assigned to foreign keys recursively (organization is saved)
     board_dictionary = factory.build(
-        dict, organization=organization.id, FACTORY_CLASS=BoardFactory
+        dict, organization=organization.slug, FACTORY_CLASS=BoardFactory
     )
     return board_dictionary

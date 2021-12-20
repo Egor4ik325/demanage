@@ -81,11 +81,11 @@ User flow:
 
 1. User registers a new account (verifies email address) and loges-in. User profile might have avatar, username, current life status, company name.
 
-2. User creates a team (project) and becomes it's *creator/owner*. User sets up initial boards, lists and tasks for the teammates. User chooses to create public or private team.
+2. User creates a team (project) and becomes it's _creator/owner_. User sets up initial boards, lists and tasks for the teammates. User chooses to create public or private team.
 
 3. Not invited users can read board as visitors/guests by shared link.
 
-4. Creator invites other users to join team via unique generated *invite link*. Invited users get *member* role and are able to do basic project manipulations.
+4. Creator invites other users to join team via unique generated _invite link_. Invited users get _member_ role and are able to do basic project manipulations.
 
 5. Creator sets administrators from members and can transfer ownership to other users.
 
@@ -117,7 +117,7 @@ Short website permission description:
 
 - name field - unicode char field (required).
 
-- slug field - created from unicode name, slug also support unicode  (required in the model and admin, not shown in MVT) (prepolulated in the admin and set from name in the form).
+- slug field - created from unicode name, slug also support unicode (required in the model and admin, not shown in MVT) (prepolulated in the admin and set from name in the form).
 
 - location field - contains real world country code.
 
@@ -224,7 +224,7 @@ What is this project about?
 
 > More features is only better for the project.
 
-*Potential* project feature list.
+_Potential_ project feature list.
 
 Traditions:
 
@@ -292,7 +292,7 @@ Integrations with other business services:
 
 ## Technology
 
-*Potential* (nice to have) list of technologies involved in this project. Not implemented features move to the next projects.
+_Potential_ (nice to have) list of technologies involved in this project. Not implemented features move to the next projects.
 
 Technologies:
 
@@ -318,11 +318,11 @@ Innovations:
 - <u>error reporting</u>
 - task queue (Celery)
 - message broker (RabbitMQ)
-- --*PDF generation*
-- --*integrated chat*
+- --_PDF generation_
+- --_integrated chat_
 - --django command extensions
-- *push notification to mobile devices*
-- *send emails/SMS service*
+- _push notification to mobile devices_
+- _send emails/SMS service_
 - 3-rd party Python packages
 - 3-rd party Django packages
 
@@ -337,5 +337,7 @@ List of potential web services that will be used in this projects (development/p
 - AWS (cloud)
 
 - Sentry (monitoring)
+
+- Direct public APIs (from owner)
 
 - RapidAPI (APIs)

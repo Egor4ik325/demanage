@@ -20,7 +20,7 @@ class Board(TimeStampedModel):
     )
     public = models.BooleanField(
         verbose_name=_("Public"),
-        help_text=_("Whether the board is available to all oraganization members."),
+        help_text=_("Whether the board is available to all members or only selected."),
         null=False,
         default=True,
         blank=False,
@@ -82,4 +82,4 @@ class Board(TimeStampedModel):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("api:boards_detail", kwargs={"slug": self.slug})
+        return reverse("api:boards-detail", kwargs={"slug": self.slug})

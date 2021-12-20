@@ -74,3 +74,13 @@ def test_organization_can_not_be_changed(board, organization, rq):
     serializer.save()
 
     assert board.organization.id != organization.id
+
+
+def test_can_not_create_board_in_other_organization(organization, rq, user, board_data):
+    """Request user wants to create board in organization where he is not representative."""
+    rq.user = user
+    serializer = BoardSerializer(data=board_data, context={"request": rq})
+
+    assert (
+        not serializer.is_valid()
+    ), "Should not be valid because other organization are not found (not in choice)."
