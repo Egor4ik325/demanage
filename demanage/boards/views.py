@@ -1,3 +1,5 @@
+from django.db.models.query import QuerySet
+from guardian.shortcuts import get_objects_for_user
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -38,7 +40,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     # search_fields = []
     # ordering_fields = []
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """
         1. Return all boards in organizations where user is representative.
         2. Return public boards in organization where user is member.
@@ -51,16 +53,17 @@ class BoardViewSet(viewsets.ModelViewSet):
         public_membered_boards = Board.objects.filter(
             public=True, organization__members__user=user
         )
-        # Boards that user has permission to view
-        # TODO:
+        # Get all boards that user has permission to view (assume user is member of board's organization)
+        private_permitted_boards = get_objects_for_user(user, "boards.view_board")
 
-        return None
+        return represented_boards | public_membered_boards | private_permitted_boards
 
     # @action(["POST"], True, "assign/view", "assign_view")
     # def assign_view_permission(self):
     #     """Administrative view for admin (represetnative)
     #     to assign view permission to specific object.
     #     """
+    #     # Check board is private (otherwise it doesn't make sense)
     #     pass
 
     # @action(["GET"], True, "users/view", "users_view")

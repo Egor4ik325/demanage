@@ -2,7 +2,7 @@ from typing import Any, Sequence
 
 import factory
 from django.utils.text import slugify
-from factory import Faker, post_generation
+from factory import Faker, LazyAttribute, post_generation
 from factory.django import DjangoModelFactory
 from guardian.shortcuts import assign_perm
 
@@ -11,7 +11,9 @@ from demanage.users.tests.factories import UserFactory
 
 
 class OrganizationFactory(DjangoModelFactory):
-    name = Faker("company")
+    name = LazyAttribute(
+        lambda _: Faker("company").evaluate(None, None, {"locale": None})[:50]
+    )
     slug = factory.LazyAttribute(lambda o: slugify(o.name))
     public = factory.Iterator([True, False])
     website = Faker("url")
@@ -20,7 +22,7 @@ class OrganizationFactory(DjangoModelFactory):
     representative = factory.SubFactory(UserFactory)
 
     @post_generation
-    def permissions(obj, create: bool, extracted: Sequence[Any], **kwargs):
+    def assign_permissions(obj, create: bool, extracted: Sequence[Any], **kwargs):
         if not create:
             return
 

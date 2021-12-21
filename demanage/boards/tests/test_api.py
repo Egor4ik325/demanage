@@ -3,6 +3,7 @@ Check that API is working correctly.
 """
 import pytest
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 
 from demanage.boards.models import Board
 from demanage.conftest import board
@@ -54,6 +55,12 @@ def test_list_boards_zero_boards(api_client_factory, organization):
     assert len(response.data) == 0
 
 
+def unauthenticated_user_can_not_list_or_do_anything_with_boards(api_client):
+    response = api_client.get(reverse("api:board-list"))
+
+    assert response.status_code == 401
+
+
 def test_representative_can_get_board(api_client_factory, board):
     api_client = api_client_factory(board.organization.representative)
     response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
@@ -61,11 +68,144 @@ def test_representative_can_get_board(api_client_factory, board):
     assert response.status_code == 200
 
 
-def test_get_other_board_is_not_found(api_client_factory, board):
+def test_user_can_not_get_other_board_is_not_found(api_client_factory, board):
     api_client = api_client_factory()
     response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
 
-    assert response.status_code == 400
+    assert response.status_code == 404
+
+
+def test_user_can_view_public_board_in_membered_organization(
+    member, api_client_factory
+):
+    """User that is member in organization can view public board in this organization."""
+    api_client = api_client_factory(member.user)
+    board = BoardFactory(public=True, organization=member.organization)
+
+    response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
+
+    assert response.status_code == 200
+
+
+def test_user_cant_view_private_board_as_member(member, api_client_factory):
+    api_client = api_client_factory(member.user)
+    board = BoardFactory(public=False, organization=member.organization)
+
+    response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
+
+    assert response.status_code == 404
+
+
+def representative_can_view_private_board_in_its_organization(
+    api_client_factory, board
+):
+    api_client = api_client_factory(board.organization.representative)
+    response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
+
+    assert response.status_code == 200
+
+
+def test_user_can_view_board_with_view_permission(member, api_client_factory):
+    api_client = api_client_factory(member.user)
+    board = BoardFactory(public=False, organization=member.organization)
+    assign_perm("view_board", member.user, board)
+
+    response = api_client.get(reverse("api:board-detail", kwargs={"slug": board.slug}))
+
+    assert response.status_code == 200
+
+
+# Update
+
+
+def test_representative_can_update_the_board_description(api_client_factory, board):
+    api_client = api_client_factory(board.organization.representative)
+
+    response = api_client.patch(
+        reverse("api:board-detail", kwargs={"slug": board.slug}),
+        {"description": "New description"},
+    )
+
+    assert response.status_code == 200
+
+
+def test_user_try_update_board_not_found(api_client_factory, board):
+    api_client = api_client_factory()
+
+    response = api_client.patch(
+        reverse("api:board-detail", kwargs={"slug": board.slug}),
+        {"description": "New description"},
+    )
+
+    assert response.status_code == 404
+
+
+def test_member_can_not_update_public_board(member, api_client_factory):
+    board = BoardFactory(public=True, organization=member.organization)
+    api_client = api_client_factory(member.user)
+
+    response = api_client.patch(
+        reverse("api:board-detail", kwargs={"slug": board.slug}),
+        {"description": "New description"},
+    )
+
+    assert response.status_code == 403
+
+
+# Delete
+
+
+def test_representative_can_delete_the_board(api_client_factory, board):
+    user = board.organization.representative
+    api_client = api_client_factory(user)
+
+    response = api_client.delete(
+        reverse("api:board-detail", kwargs={"slug": board.slug})
+    )
+
+    assert response.status_code == 204
+
+
+def test_non_member_delete_get_not_found(api_client_factory, board):
+    api_client = api_client_factory()
+
+    response = api_client.delete(
+        reverse("api:board-detail", kwargs={"slug": board.slug})
+    )
+
+    assert response.status_code == 404
+
+
+def test_member_with_permission_can_not_delete_private_board(
+    member, api_client_factory
+):
+    board = BoardFactory(public=True, organization=member.organization)
+    api_client = api_client_factory(member.user)
+
+    response = api_client.delete(
+        reverse("api:board-detail", kwargs={"slug": board.slug})
+    )
+
+    assert response.status_code == 403
+
+
+# Assigning permissions
+
+
+def test_representative_can_assign_permission_to_view_board():
+    pass
+
+
+def test_representative_can_remove_permission_from_the_member_user():
+    pass
+
+
+def test_representative_cant_assign_permission_to_not_existing_user():
+    pass
+
+
+def test_user_can_not_assign_permission_to_other_board_public_or_private():
+    pass
 
 
 # assert response.status_code == 200
