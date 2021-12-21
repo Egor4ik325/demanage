@@ -2,9 +2,6 @@ from rest_framework import permissions
 from rest_framework.request import Request
 from rest_framework.viewsets import ViewSet
 
-from demanage.conftest import organization
-from demanage.members.models import Member
-
 from .models import Board
 
 

@@ -1,12 +1,8 @@
 import pytest
-from rest_framework import serializers
-
-from demanage.boards.models import Board
-from demanage.conftest import organization
-
-pytestmark = pytest.mark.django_db
 
 from ..serializers import BoardSerializer
+
+pytestmark = pytest.mark.django_db
 
 
 def test_fake_factory_data_is_valid(board_data, organization, rq):

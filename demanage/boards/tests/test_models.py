@@ -1,9 +1,9 @@
 import pytest
 from django.utils.text import slugify
 
-pytestmark = pytest.mark.django_db
-
 from ..models import Board
+
+pytestmark = pytest.mark.django_db
 
 
 def test_create_board_via_factory(board):

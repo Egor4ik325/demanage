@@ -59,6 +59,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     # "django.contrib.humanize", # Handy template tags
     "grappelli",
     "django.contrib.admin",
@@ -76,6 +77,7 @@ THIRD_PARTY_APPS = [
     "django_countries",
     "guardian",
     "drf_spectacular",
+    "django_filters",
 ]
 
 LOCAL_APPS = [

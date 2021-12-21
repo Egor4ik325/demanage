@@ -6,7 +6,7 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
 from demanage.boards.models import Board
-from demanage.conftest import board
+from demanage.members.models import Member
 
 from .factories import BoardFactory
 
@@ -46,13 +46,13 @@ def test_list_board_are_in_representative_organization(
 
     response = api_client.get(reverse("api:board-list"))
 
-    assert len(response.data) == 10
+    assert response.data["count"] == 10
 
 
 def test_list_boards_zero_boards(api_client_factory, organization):
     api_client = api_client_factory(organization.representative)
     response = api_client.get(reverse("api:board-list"))
-    assert len(response.data) == 0
+    assert response.data["count"] == 0
 
 
 def unauthenticated_user_can_not_list_or_do_anything_with_boards(api_client):
@@ -187,6 +187,81 @@ def test_member_with_permission_can_not_delete_private_board(
     )
 
     assert response.status_code == 403
+
+
+# Test filetering
+
+
+def test_boards_are_split_into_2_pages_with_default_page_size(
+    api_client_factory, organization
+):
+    user = organization.representative
+    BoardFactory.create_batch(15, organization=organization)
+    api_client = api_client_factory(user)
+
+    response = api_client.get(reverse("api:board-list"))
+
+    assert len(response.data["results"]) == 10
+    assert response.data["next"] is not None
+
+
+def test_boards_can_be_filtered_by_organization_they_belong_to(
+    api_client_factory, organization
+):
+    """5 other boards. 5 belonged boards. 1 boards in membered organization."""
+    user = organization.representative
+    BoardFactory.create_batch(5)
+    board_other = BoardFactory.create()
+    Member.objects.create(organization=board_other.organization, user=user)
+    BoardFactory.create_batch(5, organization=organization)
+    api_client = api_client_factory(user)
+    response = api_client.get(reverse("api:board-list"), {"filter": organization.slug})
+
+    assert response.status_code == 200
+    assert response.data["count"] == 5
+
+
+def test_boards_can_be_ordered_by_create_time(api_client_factory, organization):
+    board1 = BoardFactory(organization=organization)
+    board2 = BoardFactory(organization=organization)
+    board3 = BoardFactory(organization=organization)
+    api_client = api_client_factory(organization.representative)
+    response = api_client.get(reverse("api:board-list"), {"ordering": "-created"})
+
+    assert response.status_code == 200
+    assert response.data["results"][0]["slug"] == board3.slug
+    assert response.data["results"][1]["slug"] == board2.slug
+    assert response.data["results"][2]["slug"] == board1.slug
+
+
+def test_boards_can_be_seared_through_by_title_and_description(
+    api_client_factory, organization
+):
+    BoardFactory(
+        organization=organization,
+        title="Youtube",
+        description="Youtube is a Google product.",
+    )
+    BoardFactory(
+        organization=organization,
+        title="Android",
+        description="Android was bought by Google.",
+    )
+    BoardFactory(
+        organization=organization,
+        title="Trello",
+        description="Trello is created by Atlassian.",
+    )
+    BoardFactory(
+        organization=organization,
+        title="Google Drive",
+        description="Free cloud storage that doesn't care about you privacy.",
+    )
+    api_client = api_client_factory(organization.representative)
+    response = api_client.get(reverse("api:board-list"), {"search": "Google"})
+
+    assert response.status_code == 200
+    assert response.data["count"] == 3
 
 
 # Assigning permissions

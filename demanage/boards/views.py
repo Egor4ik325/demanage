@@ -1,13 +1,18 @@
 from django.db.models.query import QuerySet
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from guardian.shortcuts import get_objects_for_user
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import action
 
+from .filters import BoardFilter
 from .models import Board
+from .ordering_filters import BoardOrderingFilter
 from .pagination import BoardPagination
 from .permissions import BoardPermission
+from .search_filters import BoardSearchFilter
 from .serializers import BoardSerializer
+
+# from rest_framework.decorators import action
 
 
 class BoardViewSet(viewsets.ModelViewSet):
@@ -29,16 +34,13 @@ class BoardViewSet(viewsets.ModelViewSet):
     permission_classes = [BoardPermission]
 
     # Result correction
-    # pagination_class = BoardPagination
-    # filter_backends = [
-    #     DjangoFilterBackend,
-    #     filters.SearchFilter,
-    #     filters.OrderingFilter,
-    # ]
-    # filterset_class = BoardFilter
-    # filterset_fields = []
-    # search_fields = []
-    # ordering_fields = []
+    pagination_class = BoardPagination
+    filter_backends = [
+        DjangoFilterBackend,
+        BoardSearchFilter,
+        BoardOrderingFilter,
+    ]
+    filterset_class = BoardFilter
 
     def get_queryset(self) -> QuerySet:
         """

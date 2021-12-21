@@ -1,4 +1,3 @@
-from django.db.models import query
 from rest_framework import serializers
 
 from demanage.organizations.models import Organization
