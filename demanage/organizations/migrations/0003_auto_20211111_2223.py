@@ -10,19 +10,31 @@ def create_groups(apps: Apps, schema_editor: BaseDatabaseSchemaEditor):
     Create permission groups for application-wide usage.
     """
     Group = apps.get_model("auth", "Group")
+    ContentType = apps.get_model("contenttypes", "contenttype")
+    Organization = apps.get_model("organizations.organization")
     Permission = apps.get_model("auth", "Permission")
+
+    # Create group (initial migration) or get created (duplicate migration)
     organization_representatives_group, created = Group.objects.get_or_create(
         name="Organization Representatives"
     )
 
+    # Get organization type (for generic permission)
+    organization_content_type = ContentType.objects.get_for_model(Organization)
+
     # Add group permissions (if not already added)
-    can_add_organization = Permission.objects.get(codename="add_organization")
+    can_add_organization, _ = Permission.objects.get_or_create(
+        codename="add_organization", content_type=organization_content_type
+    )
     organization_representatives_group.permissions.add(can_add_organization)
 
 
 class Migration(migrations.Migration):
 
+    # For creating permissions needs auth_permission and contenttypes_contenttype
     dependencies = [
+        ("contenttypes", "__latest__"),
+        ("auth", "__latest__"),
         ("organizations", "0002_auto_20211107_1326"),
     ]
 

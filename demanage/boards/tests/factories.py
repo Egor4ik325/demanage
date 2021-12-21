@@ -17,7 +17,7 @@ class BoardFactory(DjangoModelFactory):
 
     # Generate business name (title) with length <= 50
     title = LazyAttribute(
-        lambda o: Faker("bs").evaluate(None, None, {"locale": None})[:50]
+        lambda o: Faker("bs").evaluate(None, None, {"locale": None})[:45]  # ? 50
     )
 
     public = Faker("boolean")

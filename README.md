@@ -21,6 +21,15 @@ Similar applications:
 
 - Taiga.io
 
+## Run this app
+
+There might be an issue when executing custom migration (other migrations should be run first, at least organization migrations).
+
+Django default permission are created in `post_migrate` hook (after all migrations),
+so it is impossible to reference them in the initial `migrate` run.
+
+For that permission required should be created at migrations stage (or permission object creating should be moved after migration stage).
+
 ## Description/requirements
 
 ## Roadmap
