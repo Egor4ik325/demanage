@@ -22,4 +22,5 @@ urlpatterns = [
     ),
     # Endpoints
     path("", include("demanage.invitations.api_urls", namespace="invitations")),
+    path("", include("demanage.boards.urls")),
 ]

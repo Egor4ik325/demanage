@@ -15,6 +15,7 @@ from demanage.members.models import Member
 from demanage.members.tests.factories import MemberFactory
 from demanage.organizations.models import Organization
 from demanage.organizations.tests.factories import OrganizationFactory
+from demanage.permissions.tests.factories import UserObjectPermissionFactory
 from demanage.users.models import User
 from demanage.users.tests.factories import UserFactory
 
@@ -131,3 +132,18 @@ def board_build_dict(organization) -> dict:
         dict, organization=organization.slug, FACTORY_CLASS=BoardFactory
     )
     return board_dictionary
+
+
+@pytest.fixture
+def make_board():
+    """Board fixture factory."""
+
+    def make(**kwargs):
+        return BoardFactory.create(**kwargs)
+
+    return make
+
+
+@pytest.fixture
+def user_obj_perm():
+    return UserObjectPermissionFactory()

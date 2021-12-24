@@ -42,7 +42,6 @@ class Board(TimeStampedModel):
         editable=True,
         null=False,
         unique=False,
-        default=None,
         blank=True,
     )
     slug = models.SlugField(
@@ -65,7 +64,10 @@ class Board(TimeStampedModel):
         unique_together = []
         ordering = ["title"]
         default_permissions = ["view"]
-        permissions = []
+        permissions = [
+            ("add_list", "Can create new list in the board"),
+            ("add_card", "Can create new card in the board"),
+        ]
         get_latest_by = "modified"
 
     def clean(self):

@@ -30,6 +30,13 @@ so it is impossible to reference them in the initial `migrate` run.
 
 For that permission required should be created at migrations stage (or permission object creating should be moved after migration stage).
 
+To start a controlled Django container use (just like local shell):
+
+```bash
+docker compose -f local.yml up --detach postgres
+docker compose -f local.yml run --rm --no-deps --service-ports django bash
+```
+
 ## Description/requirements
 
 ## Roadmap
