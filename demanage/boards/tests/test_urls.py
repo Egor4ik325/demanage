@@ -1,7 +1,4 @@
-import pytest
 from django.urls import reverse
-
-pytestmark = pytest.mark.django_db
 
 
 def test_boards_reverse_url():

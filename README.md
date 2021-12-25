@@ -77,17 +77,21 @@ docker compose -f local.yml run --rm --no-deps --service-ports django bash
 
 - [x] Organization member **invitation**
 
-- [ ] Board, list, task API CRUDs
+- [x] Boards
 
-- [ ] Notifications
+- [x] Object-level member administration API
 
-- [ ] Slack integration
+- [ ] List, task API CRUDs
 
-- [ ] Configure email authentication (production)
+- [ ] Notifications (schedule tasks)
 
-- [ ] Configure error monitoring (production)
+- [ ] Slack integration (3rd-party API)
 
-- [ ] Single-page application
+- [ ] Configure email authentication (production)??
+
+- [ ] Configure error monitoring (production)??
+
+- [ ] Single-page application??
 
 ### Design
 

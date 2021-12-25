@@ -9,7 +9,7 @@ class BoardUserPermissionPermission(BasePermission):
 
     def has_permission(self, request, view: APIView) -> bool:
         """Only authenticated requests are permitted."""
-        return request.user.authenticated
+        return request.user.is_authenticated
 
     def has_object_permission(self, request, view: APIView, obj) -> bool:
         """Only representative has access to this administration system."""

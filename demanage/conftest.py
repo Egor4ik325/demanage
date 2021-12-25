@@ -147,3 +147,8 @@ def make_board():
 @pytest.fixture
 def user_obj_perm():
     return UserObjectPermissionFactory()
+
+
+@pytest.fixture
+def make_user_board_perm():
+    return lambda **kwargs: UserObjectPermissionFactory(**kwargs)
