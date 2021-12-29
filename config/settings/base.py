@@ -70,6 +70,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.github",
     "django_celery_beat",
     "rest_framework",
     "rest_framework.authtoken",
@@ -79,7 +80,6 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "django_filters",
 ]
-
 LOCAL_APPS = [
     "demanage.users.apps.UsersConfig",
     "demanage.organizations.apps.OrganizationsConfig",
@@ -287,6 +287,7 @@ CELERY_TASK_TIME_LIMIT = 5 * 60
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -300,6 +301,15 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "demanage.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "demanage.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {
+        "APP": {
+            "client_id": env("GITHUB_APP_CLIENT_ID"),
+            "secret": env("GITHUB_APP_SECRET"),
+            "key": "",
+        }
+    }
+}
 
 # django-rest-framework
 # -------------------------------------------------------------------------------
